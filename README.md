@@ -39,7 +39,7 @@ a detailed explanation of each URL vulnerability type and the methods used to de
 ```sh
 pip install flask werkzeug
 ```
-## Running the Application
+## How to Run
 
 Step 1: Clone the Repository (if applicable):
 
