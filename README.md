@@ -10,7 +10,7 @@ For iOS IPA analysis, the tool inspects the Info.plist file to identify security
 ## URL Vulnerability Scanning 🔗 
 The tool evaluates URLs for common web vulnerabilities, including Subdomain Takeover, SQL Injection, Cross-Site Scripting (XSS), Open Redirect, and Local File Inclusion (LFI) threats. By scanning for these security risks, it helps prevent unauthorized access, data leaks, and exploitation of web applications.
 
-## Requirdemnt 🛠️
+## Requirement 🛠️
 
 ### Core Requirements
 
@@ -36,3 +36,99 @@ sublist3r==1.0
 apkleaks==2.1.0
 uro==1.0.1
 ```
+
+### Cross-Platform Setup Instructions
+
+1. For Kali Linux
+```
+# Install system dependencies
+sudo apt update && sudo apt install -y \
+    python3-pip \
+    apktool \
+    openjdk-11-jdk \
+    android-sdk \
+    golang
+
+# Set Android SDK path
+echo 'export ANDROID_HOME=/usr/lib/android-sdk' >> ~/.bashrc
+source ~/.bashrc
+
+# Install Go tools
+go install -v github.com/projectdiscovery/nuclei/v2/cmd/nuclei@latest
+go install github.com/tomnomnom/waybackurls@latest
+go install github.com/tomnomnom/gf@latest
+
+# Clone security tools
+git clone https://github.com/Parameter-SecURITY/SQLiDetector.git
+git clone https://github.com/jiyoches/webster
+
+# Install Python requirements
+pip3 install -r requirements.txt
+```
+2. For macOS
+```
+# Install Homebrew if not installed
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Install dependencies
+brew install \
+    python@3.10 \
+    apktool \
+    openjdk \
+    android-sdk \
+    golang
+
+# Set Android SDK path
+echo 'export ANDROID_HOME=$HOME/Library/Android/sdk' >> ~/.zshrc
+source ~/.zshrc
+
+# Rest same as Kali Linux instructions from Go tools onward
+```
+### Automated Setup Scripts
+Linux/macOS Setup Script (setup.sh)
+```
+#!/bin/bash
+
+# Check OS and install dependencies
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    sudo apt update && sudo apt install -y python3-pip apktool openjdk-11-jdk android-sdk golang
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    brew install python@3.10 apktool openjdk android-sdk golang
+fi
+
+# Setup environment
+export ANDROID_HOME=$([ "$OSTYPE" == "darwin"* ] && echo "$HOME/Library/Android/sdk" || echo "/usr/lib/android-sdk")
+echo "export ANDROID_HOME=$ANDROID_HOME" >> $HOME/.${SHELL##*/}rc
+
+# Install Go tools
+go install -v github.com/projectdiscovery/nuclei/v2/cmd/nuclei@latest
+go install github.com/tomnomnom/waybackurls@latest
+go install github.com/tomnomnom/gf@latest
+
+# Clone tools
+git clone https://github.com/Parameter-SecURITY/SQLiDetector.git
+git clone https://github.com/jiyoches/webster
+
+# Python setup
+pip3 install -r requirements.txt
+
+echo "Setup complete! Restart your shell."
+```
+
+## How to run 🚀
+
+Step 1: Clone the Repository
+```
+git clone https://github.com/jeel38/AppSentinel.git
+```
+Step 2: Install requirement tools
+```
+./setup.sh
+```
+Step 3: Start the Flask Application
+```
+python3 app.py
+```
+Step 4: Access the Application
+
+Open your web browser and navigate to ``` http://localhost:5000 ```
