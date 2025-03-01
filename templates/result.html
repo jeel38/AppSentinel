@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Result</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        p {
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            word-wrap: break-word;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .category {
+            font-weight: bold;
+        }
+
+        .status {
+            margin-left: 10px;
+            color: #007BFF;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        button {
+            margin-top: 5px;
+        }
+        button, input[type="submit"] {
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover, input[type="submit"]:hover {
+    background-color: #0056b3;
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Upload Result</h1>
+        <p>Filename: {{ filename }}</p>
+        <p>MD5: {{ md5 }}</p>
+        <p>SHA256: {{ sha256 }}</p>
+        <p>Package Name: {{ package_name }}</p>
+        {% if main_activity_name %}
+        <p>Main Activity Name: {{ main_activity_name }}</p>
+        {% endif %}
+        
+        {% if main_activity_name %}
+            <form action="/view_manifest" method="post">
+                <input type="hidden" name="filename" value="{{ filename }}">
+                <input type="submit" value="View Manifest Code">
+            </form>
+        {% endif %}
+        
+        {% if filename.endswith('.ipa') %}
+            <form action="/view_info_plist" method="post">
+                <input type="hidden" name="filename" value="{{ filename }}">
+                <input type="submit" value="View Info.plist">
+            </form>
+        {% endif %}
+        <br>
+        <form action="/view_strings" method="post">
+            <input type="hidden" name="filename" value="{{ filename }}">
+            <input type="submit" value="View Strings">
+        </form>
+        <!-- Add button to view source code -->
+       <!-- <form action="/view_source_code" method="GET">
+            <input type="submit" value="View Source Code">
+        </form>
+        -->
+        
+        <!-- Static Analysis Results -->
+        <h2>Static Analysis Results</h2>
+        <table>
+            <tr>
+                <th>Category</th>
+                <th>Values</th>
+                <th>Vulnerability Check</th>
+            </tr>
+     
+            <tr>
+    <td class="category">URLs</td>
+    <td>
+        <ul id="urlList">
+            {% if analysis_results['urls'] or linkfinder %}
+                {% for url in analysis_results['urls'] %}
+                    <li>{{ url }}</li>
+                {% endfor %}
+                {% for link in http_urls %}
+                    <li>{{ link }}</li>
+                {% endfor %}
+            {% else %}
+                Not found
+            {% endif %}
+        </ul>
+    </td>
+    <td>
+        <form action="/check_urls_vulnerability" method="POST" target="_blank">
+            <input type="hidden" id="urlsInput" name="urls">
+            <input type="submit" value="Check URLs Vulnerability" onclick="setUrls()">
+        </form>
+    </td>
+</tr>
+            <tr>
+                <td class="category">Emails</td>
+                <td>
+                    {% if analysis_results['emails'] or mailto %}
+                        {% for email in analysis_results['emails'] %}
+                            {{ email }}<br>
+                        {% endfor %}
+                        {% for mail in mailto %}
+                            {{ mail }}<br>
+                        {% endfor %}
+                    {% else %}
+                        Not found
+                    {% endif %}
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td class="category">Credentials</td>
+                <td>
+                    {% if analysis_results['credentials'] %}
+                        {% for cred in analysis_results['credentials'] %}
+                            Username: {{ cred['username'] }}, Password: {{ cred['password'] }}<br>
+                        {% endfor %}
+                    {% else %}
+                        Not found
+                    {% endif %}
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td class="category">Firebase</td>
+                <td>
+                    {% if firebase %}
+                        {% for fb in firebase %}
+                            <span>{{ fb }}</span>
+                            <br>
+                        {% endfor %}
+                    {% else %}
+                        Not found
+                    {% endif %}
+                </td>
+                <td>
+                	 {% if firebase %}
+                        {% for fb in firebase %}
+                            <button onclick="checkFirebaseVulnerability('{{ fb }}', this)">Vulnerability Check</button>
+                            <span class="status"></span>
+                            <br>
+                        {% endfor %}
+                    {% else %}
+                        Not found
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td class="category">IP Address</td>
+                <td>
+                    {% if ip_address %}
+                        {% for ip in ip_address %}
+                            {{ ip }}<br>
+                        {% endfor %}
+                    {% else %}
+                        Not found
+                    {% endif %}
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td class="category">Google API Keys</td>
+                <td>
+                    {% for key in google_api_key %}
+                        {{ key }}<br>
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for key in google_api_key %}
+                    <form action="/check_api_vulnerability" method="POST" target="_blank">
+                        <input type="hidden" name="api_key" value="{{ key }}">
+                        <input type="submit" value="Check API Vulnerability">
+                    </form>
+                    {% endfor %}
+                </td>
+            </tr>
+            <tr>
+                <td class="category">Google OAuth</td>
+                <td>
+                    {% if google_oauth %}
+                        {% for oauth in google_oauth %}
+                            {{ oauth }}<br>
+                        {% endfor %}
+                    {% else %}
+                        Not found
+                    {% endif %}
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td class="category">Amazon AWS S3 Bucket</td>
+                <td>
+                    {% if amazon_AWS_S3_Bucket %}
+                        {% for bucket in amazon_AWS_S3_Bucket %}
+                            <span>{{ bucket }}</span>
+                            <br>
+                        {% endfor %}
+                    {% else %}
+                        Not found
+                    {% endif %}
+                </td>
+                <td>
+                	{% if amazon_AWS_S3_Bucket %}
+                        {% for bucket in amazon_AWS_S3_Bucket %}
+                            
+                            <button onclick="checkS3Vulnerability('{{ bucket }}', this)">Vulnerability Check</button>
+                            <span class="status"></span>
+                            <br>
+                        {% endfor %}
+                    {% else %}
+                        Not found
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <script>
+        function checkFirebaseVulnerability(firebaseUrl, button) {
+            const statusElement = button.nextElementSibling;
+            statusElement.textContent = "Checking...";
+            fetch('https://' + firebaseUrl + '/.json')
+                .then(response => {
+                    statusElement.textContent = 'Status: ' + response.status;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    statusElement.textContent = 'Status: Error';
+                });
+        }
+
+        function checkS3Vulnerability(bucketUrl, button) {
+            const statusElement = button.nextElementSibling;
+            statusElement.textContent = "Checking...";
+            fetch(bucketUrl)
+                .then(response => {
+                    statusElement.textContent = 'Status: ' + response.status;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    statusElement.textContent = 'Status: Error';
+                });
+        }
+    </script>
+    <script>
+    function setUrls() {
+        const urlList = document.getElementById('urlList').getElementsByTagName('li');
+        const urls = [];
+        for (let i = 0; i < urlList.length; i++) {
+            urls.push(urlList[i].textContent);
+        }
+        document.getElementById('urlsInput').value = JSON.stringify(urls);
+    }
+</script>
+</body>
+</html>

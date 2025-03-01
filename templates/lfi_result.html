@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LFI Check Result</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #2980b9;
+            padding-bottom: 10px;
+        }
+        p {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+        h3 {
+            color: #34495e;
+            margin-top: 20px;
+        }
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .url {
+            color: #2980b9;
+            word-wrap: break-word;
+            background-color: #eaf2f8;
+            border: 1px solid #2980b9;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .url:hover {
+            background-color: #2980b9;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <h2>LFI Check Result</h2>
+    <p>URL checked: {{ url }}</p>
+    
+    <h3>Vulnerable URLs:</h3>
+    <ul>
+        {% for url in urls %}
+            <li class="url">{{ url }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

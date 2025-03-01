@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Source Code</title>
+</head>
+<body>
+    <h1>Decompiled Source Code</h1>
+    {% if decompile_dir %}
+        <ul>
+            {% for root, dirs, files in os.walk(decompile_dir) %}
+                {% for file in files %}
+                    {% if file.endswith('.java') %}
+                        <li><a href="{{ os.path.join(root, file) }}" target="_blank">{{ os.path.join(root, file) }}</a></li>
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No decompiled source code available.</p>
+    {% endif %}
+</body>
+</html>

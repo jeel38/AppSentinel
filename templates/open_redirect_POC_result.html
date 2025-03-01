@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Open Redirect Check Result</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 20px;
+            padding: 20px;
+        }
+        h2 {
+            color: #333;
+            border-bottom: 2px solid #333;
+            padding-bottom: 5px;
+        }
+        h3 {
+            color: #555;
+            margin-top: 20px;
+        }
+        p {
+            color: #666;
+            font-style: italic;
+        }
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        li {
+            margin-bottom: 5px;
+            background-color: #fff;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Open Redirect POC Result</h2>
+    <p>URL checked: {{ url }}</p>
+    
+    <h3>Vulnerable URLs:</h3>
+    <ul>
+        {% for vulnerable_url in vulnerable_urls %}
+            <li>{{ vulnerable_url }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
